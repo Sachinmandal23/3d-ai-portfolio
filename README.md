@@ -45,21 +45,17 @@ To run this project locally, follow these steps:
 
 1. Clone the Repository
 Bash
-
-
 git clone [https://github.com/Sachinmandal23/3d-ai-portfolio.git](https://github.com/Sachinmandal23/3d-ai-portfolio.git)
 cd 3d-ai-portfolio
+
 2. Run the Frontend
 Bash
-
-
 cd frontend
 npm install
 npm run dev
+
 3. Run the Backend
 Bash
-
-
 cd ../portfolio-backend
 # Run via your preferred IDE (IntelliJ / Eclipse / VS Code) or using Maven:
 mvn spring-boot:run
