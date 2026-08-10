@@ -1,32 +1,63 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const skills = [
-  { name: "Java", color: "#f89820" },
-  { name: "Spring Boot", color: "#6db33f" },
-  { name: "React.js", color: "#61dbfb" },
-  { name: "SQL / Databases", color: "#00ffcc" },
-  { name: "Python", color: "#ffd43b" },
-  { name: "JavaScript", color: "#f7df1e" },
-  { name: "Apache Kafka", color: "#e11d48" }, // Light mode ke liye thoda visible color
-  { name: "Node.js", color: "#68a063" },
-  { name: "Docker", color: "#2496ed" },
-  { name: "Git & GitHub", color: "#f05032" }
+  { name: "Java", color: "#f89820", category: "Backend" },
+  { name: "Spring Boot", color: "#6db33f", category: "Backend" },
+  { name: "React.js", color: "#61dbfb", category: "Frontend" },
+  { name: "SQL / Databases", color: "#00ffcc", category: "Backend" },
+  { name: "Python", color: "#ffd43b", category: "Backend" },
+  { name: "JavaScript", color: "#f7df1e", category: "Frontend" },
+  { name: "Apache Kafka", color: "#e11d48", category: "Backend" },
+  { name: "Node.js", color: "#68a063", category: "Backend" },
+  { name: "Docker", color: "#2496ed", category: "Tools" },
+  { name: "Git & GitHub", color: "#f05032", category: "Tools" }
 ];
 
 export default function TechBubbles({ darkMode }) {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const categories = ["All", "Backend", "Frontend", "Tools"];
+
+  const filteredSkills = useMemo(() => {
+    if (selectedCategory === "All") return skills;
+    return skills.filter(skill => skill.category === selectedCategory);
+  }, [selectedCategory]);
+
   return (
     <div style={{ width: '100%', padding: '60px 20px', textAlign: 'center', position: 'relative' }}>
       <h2 style={{ 
         color: darkMode ? '#fff' : '#111827', 
-        marginBottom: '40px', 
-        fontSize: 'clamp(2rem, 4vw, 3rem)', 
+        marginBottom: '25px', 
+        fontSize: 'clamp(1.8rem, 4vw, 3rem)', 
         borderBottom: `2px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, 
         display: 'inline-block',
         transition: 'color 0.5s'
       }}>
         Interactive Tech Stack
       </h2>
+
+      {/* Filter Buttons */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '35px', flexWrap: 'wrap' }}>
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '20px',
+              border: `1px solid ${selectedCategory === cat ? (darkMode ? '#00ffcc' : '#0d9488') : (darkMode ? 'rgba(255,255,255,0.2)' : '#cbd5e1')}`,
+              backgroundColor: selectedCategory === cat ? (darkMode ? 'rgba(0, 255, 204, 0.15)' : 'rgba(13, 148, 136, 0.15)') : 'transparent',
+              color: selectedCategory === cat ? (darkMode ? '#00ffcc' : '#0d9488') : (darkMode ? '#9ca3af' : '#4b5563'),
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
       
       <div style={{ 
         display: 'flex', 
@@ -36,16 +67,16 @@ export default function TechBubbles({ darkMode }) {
         maxWidth: '1000px', 
         margin: '0 auto' 
       }}>
-        {skills.map((skill, index) => (
+        {filteredSkills.map((skill, index) => (
           <motion.div
             key={skill.name}
-            initial={{ y: 0, scale: 1 }}
-            animate={{ y: [0, -10, 0] }}
+            layout
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1, y: [0, -10, 0] }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ 
-              duration: 3 + (index % 3), 
-              repeat: Infinity, 
-              ease: "easeInOut",
-              delay: index * 0.15 
+              y: { duration: 3 + (index % 3), repeat: Infinity, ease: "easeInOut", delay: index * 0.1 },
+              layout: { duration: 0.3 }
             }}
             whileHover={{ scale: 1.08, y: -6, boxShadow: `0 15px 30px ${skill.color}44`, borderColor: skill.color }}
             style={{

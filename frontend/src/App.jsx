@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, MeshWobbleMaterial, Environment, Torus, Octahedron, Box, Cylinder, Points, PointMaterial } from '@react-three/drei';
+import { Float, MeshWobbleMaterial, Environment, Torus, Box, Cylinder, Points, PointMaterial } from '@react-three/drei';
 import emailjs from '@emailjs/browser';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as random from 'maath/random/dist/maath-random.esm';
 import TechBubbles from './TechBubbles';
+import Terminal from './Terminal';
 
 // 1. Digital Data Stream Particles Background
 function FloatingParticles({ darkMode }) {
@@ -95,8 +96,34 @@ function SciFi3DScene({ darkMode }) {
 function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [projects, setProjects] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const [projects, setProjects] = useState([
+    {
+      title: "Employee Leave Management System",
+      description: "A web-based leave management system for employees and HR administrators with role-based access control.",
+      challenge: "Implemented secure session handling and role-based access control (RBAC) to ensure unauthorized privilege escalation is prevented.",
+      githubUrl: "https://github.com/Sachinmandal23/Employee-Leave-Management-System",
+      techStack: ["PHP", "MySQL", "HTML5", "CSS3"]
+    },
+    {
+      title: "Netflix Clone - AI Integrated",
+      description: "A responsive Netflix UI clone integrated with dynamic rendering and smooth asynchronous UI updates.",
+      challenge: "Optimized media rendering pipeline and component state management for a seamless, buffer-free streaming user experience.",
+      githubUrl: "https://github.com/Sachinmandal23/Netflix-Clone-Al-main",
+      techStack: ["JavaScript", "HTML5", "CSS3", "Netlify"]
+    },
+    {
+      title: "Resume Optimizer",
+      description: "A Python-based utility designed to parse text, analyze ATS compliance, and score resumes against target Job Descriptions.",
+      challenge: "Integrated NLP text similarity algorithms using spaCy to accurately extract key entity vectors and compute precise keyword matching scores.",
+      githubUrl: "https://github.com/Sachinmandal23/Resume_Optimizer",
+      techStack: ["Python", "Streamlit", "Spacy", "PyPDF2"]
+    }
+  ]);
+
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -136,13 +163,6 @@ function App() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isAiLoading]);
 
-  useEffect(() => {
-    fetch('http://localhost:8080/api/projects')
-      .then(res => res.json())
-      .then(data => setProjects(data))
-      .catch(err => console.error("Error fetching projects:", err));
-  }, []);
-
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isAiLoading) return;
     const userMessage = inputValue;
@@ -172,6 +192,35 @@ function App() {
       });
   };
 
+  // Smart Search Handler
+  const handleSmartSearch = (query) => {
+    setSearchQuery(query);
+    const q = query.toLowerCase().trim();
+    if (!q) return;
+
+    if (q.includes('cert') || q.includes('achieve') || q.includes('award') || q.includes('quiz')) {
+      document.getElementById('certificates')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (q.includes('educat') || q.includes('college') || q.includes('mca') || q.includes('degree') || q.includes('uni')) {
+      document.getElementById('education')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (q.includes('experi') || q.includes('intern') || q.includes('job') || q.includes('jpmorgan')) {
+      document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (q.includes('core') || q.includes('dsa') || q.includes('oop') || q.includes('sql') || q.includes('design')) {
+      document.getElementById('cscore')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (q.includes('tech') || q.includes('skill') || q.includes('java') || q.includes('spring') || q.includes('kafka')) {
+      document.getElementById('tech')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('message')) {
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const filteredProjects = projects.filter(proj => 
+    proj.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    proj.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    proj.techStack.some(tech => tech.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   const theme = {
     bg: darkMode ? '#020205' : '#f8fafc',
     text: darkMode ? '#ffffff' : '#111827',
@@ -186,6 +235,9 @@ function App() {
   return (
     <div style={{ width: '100%', minHeight: '100vh', backgroundColor: theme.bg, color: theme.text, fontFamily: 'sans-serif', transition: 'background-color 0.5s, color 0.5s', overflowX: 'hidden' }}>
       
+      {/* Terminal Component Render */}
+      <Terminal darkMode={darkMode} isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} />
+
       {/* Preloader */}
       <AnimatePresence>
         {isLoading && (
@@ -243,16 +295,40 @@ function App() {
           </div>
         </div>
 
+        {/* Desktop Navigation & Smart Search Bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }} className="desktop-nav">
+          <input 
+            type="text" 
+            placeholder="🔍 Search sections or projects..." 
+            value={searchQuery}
+            onChange={(e) => handleSmartSearch(e.target.value)}
+            style={{ 
+              padding: '6px 12px', 
+              borderRadius: '20px', 
+              border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, 
+              background: darkMode ? 'rgba(0,0,0,0.3)' : '#fff', 
+              color: theme.text,
+              fontSize: '0.8rem',
+              outline: 'none',
+              width: '200px'
+            }} 
+          />
           {['Work', 'Experience', 'CS Core', 'Tech', 'Education', 'Certificates', 'Contact'].map(item => (
             <a key={item} href={`#${item.toLowerCase().replace(' ', '')}`} style={{ color: theme.text, textDecoration: 'none', fontSize: '0.85rem', fontWeight: '500' }}>{item}</a>
           ))}
+          <button onClick={() => setIsTerminalOpen(true)} style={{ padding: '5px 12px', borderRadius: '20px', border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, background: darkMode ? 'rgba(0,255,204,0.1)' : 'rgba(13,148,136,0.1)', color: theme.text, cursor: 'pointer', fontWeight: 'bold', fontSize: '0.80rem' }}>
+            💻 Terminal
+          </button>
           <button onClick={() => setDarkMode(!darkMode)} style={{ padding: '5px 12px', borderRadius: '20px', border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, background: darkMode ? 'rgba(0,255,204,0.1)' : 'rgba(13,148,136,0.1)', color: theme.text, cursor: 'pointer', fontWeight: 'bold', fontSize: '0.80rem' }}>
             {darkMode ? '☀️ Light' : '🌙 Dark'}
           </button>
         </div>
 
+        {/* Mobile Navbar Controls */}
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }} className="mobile-toggle">
+          <button onClick={() => setIsTerminalOpen(true)} style={{ padding: '5px 10px', borderRadius: '15px', border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, background: darkMode ? 'rgba(0,255,204,0.1)' : 'rgba(13,148,136,0.1)', color: theme.text, cursor: 'pointer', fontSize: '0.75rem' }}>
+            💻
+          </button>
           <button onClick={() => setDarkMode(!darkMode)} style={{ padding: '5px 10px', borderRadius: '15px', border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, background: darkMode ? 'rgba(0,255,204,0.1)' : 'rgba(13,148,136,0.1)', color: theme.text, cursor: 'pointer', fontSize: '0.75rem' }}>
             {darkMode ? '☀️' : '🌙'}
           </button>
@@ -262,12 +338,33 @@ function App() {
         </div>
       </motion.nav>
 
+      {/* Mobile Menu Dropdown with Smart Search */}
       {menuOpen && (
         <motion.div 
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           style={{ position: 'fixed', top: '60px', left: 0, width: '100%', backgroundColor: theme.navBg, backdropFilter: 'blur(20px)', borderBottom: `1px solid ${theme.border}`, padding: '20px 25px', zIndex: 999, display: 'flex', flexDirection: 'column', gap: '15px', boxSizing: 'border-box', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
         >
+          <input 
+            type="text" 
+            placeholder="🔍 Search sections or projects..." 
+            value={searchQuery}
+            onChange={(e) => {
+              handleSmartSearch(e.target.value);
+              setMenuOpen(false);
+            }}
+            style={{ 
+              padding: '8px 12px', 
+              borderRadius: '20px', 
+              border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, 
+              background: darkMode ? 'rgba(0,0,0,0.3)' : '#fff', 
+              color: theme.text,
+              fontSize: '0.9rem',
+              outline: 'none',
+              width: '100%',
+              boxSizing: 'border-box'
+            }} 
+          />
           {['Work', 'Experience', 'CS Core', 'Tech', 'Education', 'Certificates', 'Contact'].map(item => (
             <a key={item} href={`#${item.toLowerCase().replace(' ', '')}`} onClick={() => setMenuOpen(false)} style={{ color: theme.text, textDecoration: 'none', fontSize: '1.05rem', fontWeight: '600', borderBottom: `1px solid ${theme.border}`, paddingBottom: '8px' }}>{item}</a>
           ))}
@@ -286,14 +383,14 @@ function App() {
       {/* Main Website Content */}
       <div style={{ position: 'relative', zIndex: 2, padding: '110px 5% 50px 5%', boxSizing: 'border-box' }}>
         
-        {/* Hero Section */}
+        {/* Hero / About Section */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+          style={{ minHeight: '85vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
         >
-          <div style={{ maxWidth: '750px' }}>
+          <div style={{ maxWidth: '800px' }}>
             <p style={{ color: darkMode ? '#00ffcc' : '#0d9488', letterSpacing: '2px', fontWeight: 'bold', marginBottom: '5px', fontSize: '0.85rem' }}>HELLO WORLD, I AM</p>
             <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 4.2rem)', margin: '5px 0', lineHeight: '1.1', color: theme.text, letterSpacing: '-0.03em' }}>Sachin Kumar Mandal</h1>
             
@@ -303,12 +400,13 @@ function App() {
               </h2>
             </div>
 
-            <p style={{ color: theme.cardText, fontSize: '1rem', maxWidth: '650px', marginTop: '15px', lineHeight: '1.6' }}>
-              Full-Stack & Backend Engineer specializing in scalable architectures with <strong>Java, Spring Boot, Kafka</strong>, and modern frontends. Turning complex logic into production-ready masterpieces.
+            <p style={{ color: theme.cardText, fontSize: '1.05rem', maxWidth: '720px', marginTop: '15px', lineHeight: '1.7' }}>
+              A passionate <strong>Full-Stack & Backend Engineer</strong> dedicated to building high-performance, scalable distributed systems. My approach combines robust architectural design using <strong>Java, Spring Boot, and Kafka</strong> with clean, responsive user interfaces. I focus on writing production-ready code that solves real-world engineering bottlenecks.
             </p>
 
             <div style={{ display: 'flex', gap: '15px', marginTop: '25px', flexWrap: 'wrap' }}>
               <button onClick={() => setIsChatOpen(true)} style={{ padding: '12px 22px', backgroundColor: darkMode ? '#00ffcc' : '#0d9488', color: darkMode ? '#000' : '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', boxShadow: darkMode ? '0 0 20px rgba(0,255,204,0.4)' : 'none' }}>Talk to AI 🤖</button>
+              <button onClick={() => setIsTerminalOpen(true)} style={{ padding: '12px 22px', backgroundColor: 'transparent', color: darkMode ? '#00ffcc' : '#0d9488', border: `2px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Open Terminal 💻</button>
               <motion.a 
                 href="/sachin_resume.pdf" 
                 download="Sachin_Kumar_Mandal_Resume.pdf"
@@ -358,7 +456,7 @@ function App() {
           </div>
         </div>
 
-        {/* 1. My Work Section */}
+        {/* 1. My Work Section (With Professional Challenge Highlights) */}
         <motion.div 
           id="work" 
           initial={{ opacity: 0, y: 50 }}
@@ -368,25 +466,63 @@ function App() {
           style={{ paddingBottom: '80px', paddingTop: '30px', scrollMarginTop: '100px' }}
         >
           <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: theme.text, borderBottom: `2px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, display: 'inline-block', marginBottom: '30px' }}>Featured Projects</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
-            {projects.map((proj, index) => (
-              <motion.div 
-                key={index} 
-                whileHover={{ scale: 1.03, y: -6, borderColor: darkMode ? '#00ffcc' : '#0d9488', boxShadow: darkMode ? '0 15px 30px rgba(0, 255, 204, 0.25)' : '0 10px 20px rgba(0, 0, 0, 0.1)' }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-                style={{ backgroundColor: theme.cardBg, backdropFilter: 'blur(20px)', border: `1px solid ${theme.border}`, padding: '24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}
-              >
-                <div>
-                  <h3 style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '1.3rem' }}>{proj.title}</h3>
-                  <p style={{ color: theme.cardText, margin: '12px 0', lineHeight: '1.5', fontSize: '0.95rem' }}>{proj.description}</p>
-                </div>
-                <div style={{ marginTop: '15px' }}>
-                  <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: darkMode ? '#000' : '#fff', backgroundColor: darkMode ? '#00ffcc' : '#0d9488', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', display: 'inline-block', fontSize: '0.85rem' }}>GitHub Repo ↗</a>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          
+          {filteredProjects.length === 0 ? (
+            <p style={{ color: theme.cardText, fontSize: '1rem', fontStyle: 'italic' }}>No projects found matching "{searchQuery}"</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px' }}>
+              {filteredProjects.map((proj, index) => (
+                <motion.div 
+                  key={index} 
+                  whileHover={{ scale: 1.03, y: -6, borderColor: darkMode ? '#00ffcc' : '#0d9488', boxShadow: darkMode ? '0 15px 30px rgba(0, 255, 204, 0.25)' : '0 10px 20px rgba(0, 0, 0, 0.1)' }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+                  style={{ backgroundColor: theme.cardBg, backdropFilter: 'blur(20px)', border: `1px solid ${theme.border}`, padding: '24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}
+                >
+                  <div>
+                    <h3 style={{ color: theme.text, fontSize: '1.3rem', marginBottom: '10px' }}>{proj.title}</h3>
+                    <p style={{ color: theme.cardText, margin: '10px 0', lineHeight: '1.5', fontSize: '0.92rem' }}>{proj.description}</p>
+                    
+                    {/* Professional Architectural Challenge Solved */}
+                    <div style={{ 
+                      backgroundColor: darkMode ? 'rgba(0, 255, 204, 0.05)' : 'rgba(13, 148, 136, 0.05)', 
+                      borderLeft: `3px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, 
+                      padding: '10px 12px', 
+                      margin: '12px 0', 
+                      borderRadius: '0 6px 6px 0',
+                      fontSize: '0.85rem',
+                      color: theme.text,
+                      lineHeight: '1.4'
+                    }}>
+                      <strong style={{ color: darkMode ? '#00ffcc' : '#0d9488', display: 'block', marginBottom: '3px' }}>💡 Key Engineering Challenge:</strong>
+                      {proj.challenge}
+                    </div>
+                    
+                    {/* Tech Stack Badges */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '15px 0 10px 0' }}>
+                      {proj.techStack && proj.techStack.map((tech, i) => (
+                        <span key={i} style={{ 
+                          fontSize: '0.7rem', 
+                          padding: '3px 8px', 
+                          borderRadius: '4px', 
+                          backgroundColor: darkMode ? 'rgba(0, 255, 204, 0.1)' : 'rgba(13, 148, 136, 0.1)', 
+                          color: darkMode ? '#00ffcc' : '#0d9488',
+                          border: `1px solid ${darkMode ? 'rgba(0, 255, 204, 0.3)' : 'rgba(13, 148, 136, 0.3)'}`,
+                          fontWeight: '600'
+                        }}>
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '15px' }}>
+                    <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: darkMode ? '#000' : '#fff', backgroundColor: darkMode ? '#00ffcc' : '#0d9488', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', display: 'inline-block', fontSize: '0.85rem' }}>GitHub Repo ↗</a>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* 2. Experience Section */}
@@ -411,7 +547,7 @@ function App() {
                 <span style={{ backgroundColor: darkMode ? 'rgba(0, 255, 204, 0.1)' : 'rgba(13, 148, 136, 0.1)', color: darkMode ? '#00ffcc' : '#0d9488', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}` }}>Nov 2025 - Jan 2026</span>
               </div>
               <p style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '1rem', fontWeight: 'bold', margin: 0 }}>JPMorgan Chase & Co.</p>
-              <p style={{ color: theme.cardText, lineHeight: '1.5', fontSize: '0.95rem', margin: 0 }}>Practical tasks, financial data processing, and interface integration.</p>
+              <p style={{ color: theme.cardText, lineHeight: '1.5', fontSize: '0.95rem', margin: 0 }}>Executed practical software engineering simulations focusing on financial data processing pipelines, interface integration, and backend code refactoring.</p>
             </motion.div>
 
             <motion.div 
@@ -424,7 +560,7 @@ function App() {
                 <span style={{ backgroundColor: darkMode ? 'rgba(0, 255, 204, 0.1)' : 'rgba(13, 148, 136, 0.1)', color: darkMode ? '#00ffcc' : '#0d9488', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', border: `1px solid ${darkMode ? '#00ffcc' : '#0d9488'}` }}>Sep 2023 - Oct 2023</span>
               </div>
               <p style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '1rem', fontWeight: 'bold', margin: 0 }}>The Website Makers</p>
-              <p style={{ color: theme.cardText, lineHeight: '1.5', fontSize: '0.95rem', margin: 0 }}>Built responsive web interfaces and integrated backend services.</p>
+              <p style={{ color: theme.cardText, lineHeight: '1.5', fontSize: '0.95rem', margin: 0 }}>Developed responsive user-facing web interfaces and built clean integration modules linking frontend components with backend database endpoints.</p>
             </motion.div>
 
           </div>
@@ -442,10 +578,10 @@ function App() {
           <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: theme.text, borderBottom: `2px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, display: 'inline-block', marginBottom: '30px' }}>Computer Science Core</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
             {[
-              { title: "Data Structures & Algorithms", desc: "Strong problem-solving foundation with rigorous practice in arrays, trees, graphs, and dynamic programming." },
-              { title: "Object-Oriented Programming", desc: "Expertise in OOP principles (Inheritance, Polymorphism, Encapsulation) using Java." },
-              { title: "Database Management Systems", desc: "Proficient in SQL queries, indexing, normalization, and relational database architecture." },
-              { title: "System Design & Architecture", desc: "Understanding scalable backends, microservices communication, and event-driven patterns with Kafka." }
+              { title: "Data Structures & Algorithms", desc: "Rigorous analytical problem-solving foundation optimized for time-space complexity and core algorithmic efficiency." },
+              { title: "Object-Oriented Programming", desc: "Strict adherence to SOLID principles, design patterns, encapsulation, polymorphism, and maintainable Java codebases." },
+              { title: "Database Management Systems", desc: "Advanced SQL query optimization, transaction isolation levels, indexing strategies, and relational schema normalization." },
+              { title: "System Design & Architecture", desc: "Designing scalable distributed systems, event-driven microservices communication pipelines, and resilient Kafka messaging ecosystems." }
             ].map((cs, idx) => (
               <motion.div 
                 key={idx}
@@ -489,10 +625,10 @@ function App() {
               transition={{ duration: 0.3 }} 
               style={{ backgroundColor: theme.cardBg, backdropFilter: 'blur(20px)', border: `1px solid ${theme.border}`, padding: '24px', borderRadius: '15px', cursor: 'pointer' }}
             >
-              <span style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '0.85rem', fontWeight: 'bold' }}>2025 - 2027 (Admitted 2026)</span>
+              <span style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '0.85rem', fontWeight: 'bold' }}>2024 - 2026</span>
               <h3 style={{ color: theme.text, margin: '8px 0 4px 0', fontSize: '1.2rem' }}>Master of Computer Applications (MCA)</h3>
               <p style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '0.9rem' }}>Postgraduate Degree</p>
-              <p style={{ color: theme.cardText, margin: '12px 0', fontSize: '0.9rem' }}>Advanced studies in computer applications and software architecture.</p>
+              <p style={{ color: theme.cardText, margin: '12px 0', fontSize: '0.9rem' }}>Advanced specialization in computing theory, software engineering paradigms, and scalable architecture.</p>
             </motion.div>
 
             <motion.div 
@@ -503,7 +639,7 @@ function App() {
               <span style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '0.85rem', fontWeight: 'bold' }}>Graduated July 2024</span>
               <h3 style={{ color: theme.text, margin: '8px 0 4px 0', fontSize: '1.2rem' }}>B.Sc. in Information Technology</h3>
               <p style={{ color: darkMode ? '#00ffcc' : '#0d9488', fontSize: '0.9rem' }}>Dr. Shyama Prasad Mukherjee University (CGPA: 7.71)</p>
-              <p style={{ color: theme.cardText, margin: '12px 0', fontSize: '0.9rem' }}>Foundation in IT, programming fundamentals, and database management.</p>
+              <p style={{ color: theme.cardText, margin: '12px 0', fontSize: '0.9rem' }}>Solid grounding in core computer science subjects, database administration, and application development.</p>
             </motion.div>
 
           </div>
@@ -568,16 +704,21 @@ function App() {
             <button type="submit" style={{ padding: '12px', backgroundColor: darkMode ? '#00ffcc' : '#0d9488', color: darkMode ? '#000' : '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.95rem' }}>Send Message 🚀</button>
           </form>
 
-          <div style={{ marginTop: '20px', color: theme.cardText, fontSize: '0.95rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <p style={{ margin: 0 }}>📧 Email: <a href="mailto:sachinm30k@gmail.com" style={{ color: darkMode ? '#00ffcc' : '#0d9488', textDecoration: 'none' }}>sachinm30k@gmail.com</a></p>
-            <p style={{ margin: 0 }}>📱 Phone: <a href="tel:+916203941012" style={{ color: darkMode ? '#00ffcc' : '#0d9488', textDecoration: 'none' }}>+91-6203941012</a></p>
+          {/* Fixed Contact Info Colors */}
+          <div style={{ marginTop: '20px', color: darkMode ? '#ffffff' : '#111827', fontSize: '0.95rem', display: 'flex', flexDirection: 'column', gap: '8px', fontWeight: '500' }}>
+            <p style={{ margin: 0 }}>📧 Email: <a href="mailto:sachinm30k@gmail.com" style={{ color: darkMode ? '#00ffcc' : '#0d9488', textDecoration: 'none', fontWeight: 'bold' }}>sachinm30k@gmail.com</a></p>
+            <p style={{ margin: 0 }}>📱 Phone: <a href="tel:+916203941012" style={{ color: darkMode ? '#00ffcc' : '#0d9488', textDecoration: 'none', fontWeight: 'bold' }}>+91-6203941012</a></p>
           </div>
         </motion.div>
       </div>
 
       {/* Footer */}
-      <footer style={{ position: 'relative', zIndex: 2, padding: '20px 5%', textAlign: 'center', borderTop: `1px solid ${theme.border}`, color: theme.cardText, fontSize: '0.85rem' }}>
-        <p>© 2026 Sachin Kumar Mandal. All rights reserved.</p>
+      <footer style={{ position: 'relative', zIndex: 2, padding: '30px 5%', textAlign: 'center', borderTop: `1px solid ${theme.border}`, color: theme.cardText, fontSize: '0.85rem' }}>
+        <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
+          <a href="https://github.com/Sachinmandal23" target="_blank" rel="noopener noreferrer" style={{ color: darkMode ? '#00ffcc' : '#0d9488', textDecoration: 'none', fontWeight: 'bold' }}>GitHub ↗</a>
+          <a href="https://linkedin.com/in/sachinmandal30" target="_blank" rel="noopener noreferrer" style={{ color: darkMode ? '#00ffcc' : '#0d9488', textDecoration: 'none', fontWeight: 'bold' }}>LinkedIn ↗</a>
+        </div>
+        <p>© 2026 Sachin Kumar Mandal. Built with React & Java Spring Boot.</p>
       </footer>
 
       {/* Chat Window */}
