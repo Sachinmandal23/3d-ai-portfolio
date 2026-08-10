@@ -2,6 +2,8 @@
 
 A modern, high-performance full-stack web application featuring an interactive 3D sci-fi environment, responsive UI, and a robust backend architecture designed to showcase professional software engineering skills.
 
+🔗 **Live Demo:** [https://sachin-fullstack.vercel.app](https://sachin-fullstack.vercel.app)
+
 ---
 
 ## 🚀 Features
@@ -40,7 +42,7 @@ A modern, high-performance full-stack web application featuring an interactive 3
     ├── src/              # Java controllers, services, and models
     └── pom.xml           # Maven configuration
 
-Getting Started & Local Installation
+⚙️ Getting Started & Local Installation
 To run this project locally, follow these steps:
 
 1. Clone the Repository
@@ -60,7 +62,9 @@ cd ../portfolio-backend
 # Run via your preferred IDE (IntelliJ / Eclipse / VS Code) or using Maven:
 mvn spring-boot:run
 
-👨‍💻 Author
+👨‍💻 Author & Connect
 Sachin Kumar Mandal
 Role: Full-Stack / Backend Software Engineer
 GitHub: Sachinmandal23
+Email: sachinm30k@gmail.com
+Phone: +91-6203941012
