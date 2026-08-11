@@ -408,7 +408,7 @@ function App() {
               <button onClick={() => setIsChatOpen(true)} style={{ padding: '12px 22px', backgroundColor: darkMode ? '#00ffcc' : '#0d9488', color: darkMode ? '#000' : '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', boxShadow: darkMode ? '0 0 20px rgba(0,255,204,0.4)' : 'none' }}>Talk to AI 🤖</button>
               <button onClick={() => setIsTerminalOpen(true)} style={{ padding: '12px 22px', backgroundColor: 'transparent', color: darkMode ? '#00ffcc' : '#0d9488', border: `2px solid ${darkMode ? '#00ffcc' : '#0d9488'}`, borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Open Terminal 💻</button>
               <motion.a 
-                href="/sachin_Mandal_Resume.pdf" 
+                href="/Sachin_Mandal_Resume.pdf" 
                 download="Sachin_Mandal_Resume.pdf"
                 whileHover={{ scale: 1.05 }}
                 animate={{ scale: [1, 1.03, 1] }}
