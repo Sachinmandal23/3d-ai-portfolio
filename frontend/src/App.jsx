@@ -171,7 +171,8 @@ function App() {
     setIsAiLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/chat?message=${encodeURIComponent(userMessage)}`);
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://threed-ai-portfolio-3.onrender.com";
+      const response = await fetch(`${backendUrl}/api/chat?message=${encodeURIComponent(userMessage)}`);
       const data = await response.text();
       setMessages(prev => [...prev, { text: data, sender: 'ai' }]);
     } catch (error) {
