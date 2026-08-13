@@ -66,14 +66,15 @@ public class PortfolioBackendApplication {
         public String getGithubUrl() { return githubUrl; }
     }
 
-    // CORS इनेबल करना
+    // CORS इनेबल करना (सभी के लिए ओपन)
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**").allowedOrigins("http://localhost:5173");
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
             }
         };
     }
-}
