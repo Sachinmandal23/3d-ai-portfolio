@@ -375,7 +375,6 @@ function App() {
       {/* 3D Canvas Background */}
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
         <Canvas camera={{ position: [0, 0, 7], fov: 55 }}>
-          <Environment preset="city" />
           <FloatingParticles darkMode={darkMode} />
           <SciFi3DScene darkMode={darkMode} />
         </Canvas>
